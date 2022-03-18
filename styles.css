@@ -52,10 +52,27 @@
   background-color: #6ab04c;
 }
 
-.snakeSquare {
-  background-color: #4834d4;
+.headSnakeSquare {
+  background-color: #6ab04c;
+  background-image: url(assets/img/snake_head.png);
+  background-repeat: no-repeat;
+  background-size: 130px 130px;
+  background-position: 50% 45%;
+}
+
+.bodySnakeSquare {
+  background-color: #6ab04c;
+  background-image: url(assets/img/snake_body.jpg);
+  /* border-radius: 40%; */
+  background-repeat: no-repeat;
+  background-size: 130px 130px;
+  background-position: 50% 45%;
 }
 
 .foodSquare {
-  background-color: chocolate;
+  background-color: #6ab04c;
+  background-image: url(assets/img/apple.png);
+  background-repeat: no-repeat;
+  background-size: 60px 60px;
+  background-position: 50% 45%;
 }

@@ -9,8 +9,9 @@ const boardSize = 10; //10x10
 const gameSpeed = 120;
 const squareTypes = {
   emptySquare: 0,
-  snakeSquare: 1,
-  foodSquare: 2,
+  foodSquare: 1,
+  bodySnakeSquare: 2,
+  headSnakeSquare: 3,
 };
 const directions = {
   ArrowUp: -10,
@@ -28,16 +29,24 @@ let emptySquares;
 let moveInterval;
 
 const drawSnake = () => {
-  snake.forEach((square) => drawSquare(square, "snakeSquare"));
+  snakeBody = snake.slice(1, snake.length);
+  snakeHead = snake.slice(-1)[0];
+  snakeBody.forEach((square) => drawSquare(square, "bodySnakeSquare"));
+  drawSquare(snakeHead, "headSnakeSquare");
 };
 
-// squareTypes = emptySquares, snakeSquare or foodSquare
+// squareTypes = emptySquares, headSnakeSquare, bodySnakeSquare or foodSquare
 const drawSquare = (squarePosition, squareType) => {
   const [row, column] = squarePosition.split("");
   boardSquares[row][column] = squareTypes[squareType];
   const squareElement = document.getElementById(squarePosition);
   squareElement.setAttribute("class", `square ${squareType}`);
 
+  if (squareType === "headSnakeSquare") {
+    changeSnakeHeadDirection(`${direction}`);
+  } else {
+    squareElement.style.removeProperty("transform");
+  }
   if (squareType === "emptySquare") {
     emptySquares.push(squarePosition);
   } else {
@@ -57,7 +66,8 @@ const moveSnake = () => {
     newSquare >= boardSize * boardSize || // Toca el piso
     (direction === "ArrowRight" && column == 0) || // Toca el borde derecho
     (direction === "ArrowLeft" && column == 9) || // Toca el borde izquierdo
-    boardSquares[row][column] === squareTypes.snakeSquare // Se choca consigo misma
+    boardSquares[row][column] === squareTypes.bodySnakeSquare || // Se choca consigo misma
+    boardSquares[row][column] === squareTypes.headSnakeSquare // Se choca consigo misma
   ) {
     gameOver();
   } else {
@@ -86,6 +96,29 @@ const gameOver = () => {
 
 const setDirection = (newDirection) => {
   direction = newDirection;
+};
+
+const rotateElement = (squareType, degrees) => {
+  document.getElementsByClassName(
+    `${squareType}`
+  )[0].style.transform = `rotate(${degrees}deg)`;
+};
+
+const changeSnakeHeadDirection = (arrow) => {
+  switch (arrow) {
+    case "ArrowUp":
+      rotateElement("headSnakeSquare", 180);
+      break;
+    case "ArrowDown":
+      rotateElement("headSnakeSquare", 360);
+      break;
+    case "ArrowRight":
+      rotateElement("headSnakeSquare", 270);
+      break;
+    case "ArrowLeft":
+      rotateElement("headSnakeSquare", 90);
+      break;
+  }
 };
 
 const directionEvent = (key) => {
@@ -139,7 +172,6 @@ const setGame = () => {
     new Array(boardSize).fill(squareTypes.emptySquare)
   );
   console.log(boardSquares);
-  //  Limpia el tablero por si el usuario vuelve a presionar "Start"
   board.innerHTML = "";
   emptySquares = [];
   createBoard();
@@ -153,7 +185,7 @@ const startGame = () => {
   updateScore();
   createRandomFood();
   document.addEventListener("keydown", directionEvent);
-  moveInterval = setInterval(() => moveSnake(), gameSpeed);
+  moveInterval = setInterval(moveSnake, gameSpeed);
 };
 
 const restartGame = () => {
